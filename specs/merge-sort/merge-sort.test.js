@@ -1,3 +1,4 @@
+'use strict';
 /*
   Write a function that performs mergesort
   Name the function mergeSort
@@ -6,8 +7,37 @@
   You'll need to write more than just one function
 */
 
+/**
+ * Merges two sorted arrays
+ * @param {array} left 
+ * @param {array} right 
+ */
+function merge(left, right) {
+  const sorted_arr = [];
+  while (left.length > 0 && right.length > 0) {
+    if (left[0] < right[0]) {
+      sorted_arr.push(left.shift());
+    } else {
+      sorted_arr.push(right.shift());
+    }
+  }
+  sorted_arr.push(...left, ...right);
+  return sorted_arr;
+}
+
+/**
+ * merge sort
+ * @param {array} nums 
+ */
 const mergeSort = (nums) => {
-  // code goes here
+  if (nums.length < 2) {
+    return nums;
+  }
+  const n = nums.length;
+  const split_index = Math.floor(n / 2);
+  const left_half = nums.slice(0, split_index);
+  const right_half = nums.slice(split_index, n);
+  return merge(mergeSort(left_half), mergeSort(right_half));
 };
 
 // unit tests
