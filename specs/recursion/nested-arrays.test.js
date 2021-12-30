@@ -9,11 +9,33 @@
  
  */
 
+/**
+ * Adds weird numbers
+ * @param {array} array 
+ */
 function nestedAdd(array) {
-  // write code here
+  const n = array.length;
+  let running_total = 0;
+  let i = -1;
+  const contains_nested_arr = array.some(val => {
+    i++;
+    if (typeof val === 'object') {
+      return true;
+    }
+    running_total += val;
+    return false;
+  });
+  if (!contains_nested_arr) {
+    return running_total;
+  }
+  return (
+    running_total
+    + nestedAdd(array[i])
+    + nestedAdd(array.slice(i + 1, n))
+  );
 }
 
-test.skip("nested arrays addition", () => {
+test("nested arrays addition", () => {
   expect(nestedAdd([1, 2, 3])).toEqual(6);
   expect(nestedAdd([1, [2], 3])).toEqual(6);
   expect(nestedAdd([[[[[[[[[5]]]]]]]]])).toEqual(5);
