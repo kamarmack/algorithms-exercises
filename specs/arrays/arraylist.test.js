@@ -18,7 +18,57 @@
 */
 
 class ArrayList {
-  // code goes here
+  length = 0;
+  list = {};
+  constructor(length) {
+    this.length = length || 0;
+    if (length) {
+      for (let i = 0; i < length; i++) {
+        this.list[i] = undefined;
+      }
+    }
+  }
+  push(value) {
+    this.list[this.length] = value;
+    this.length++;
+  }
+  pop() {
+    if (this.length === 0) {
+      return undefined;
+    }
+    const end = this.length - 1;
+    let pop_obj_copy = {};
+    Object.assign(pop_obj_copy, { pop_val: this.list[end] });
+    const { pop_val } = pop_obj_copy;
+    delete this.list[end];
+    this.length--;
+    return pop_val;
+  }
+  get(i) {
+    if (i < 0 || (i >= this.length)) {
+      return undefined;
+    }
+    return this.list[i];
+  }
+  delete(i) {
+    if (i < 0 || i >= this.length) {
+      return undefined;
+    }
+    let delete_object_copy = {};
+    Object.assign(delete_object_copy, { delete_val: this.list[i] });
+    const { delete_val } = delete_object_copy;
+    delete this.list[i];
+    while (i < this.length) {
+      let shift_object_copy = {};
+      Object.assign(shift_object_copy, { shift_val: this.list[i + 1] });
+      const { shift_val } = shift_object_copy;
+      this.list[i] = shift_val;
+      delete this.list[i + 1];
+      i++;
+    }
+    this.length--;
+    return delete_val;
+  }
 }
 
 // unit tests
