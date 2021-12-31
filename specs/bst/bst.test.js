@@ -20,8 +20,8 @@ class Tree {
   constructor() {
     this.root = undefined;
   }
-  add(value) {
-    const n = new Node(value);
+  add(num) {
+    const n = new Node(num);
     if (this.root === undefined) {
       this.root = n;
     }
@@ -29,7 +29,7 @@ class Tree {
       let current_root = this.root;
       let found = false;
       while (!found) {
-        if (value > current_root.value) {
+        if (num > current_root.value) {
           // go right
           if (current_root.right === undefined) {
             found = true;
