@@ -9,13 +9,61 @@
 
 */
 
+/**
+ * Returns number of digits of largest integer.
+ * @param {num[]} array 
+ */
+function getMaxLength(array) {
+  let largest = 1;
+  array.forEach(val => {
+    if (val > largest) {
+      largest = val;
+    }
+  });
+  return `${largest}`.length;
+}
+
+/**
+ * Gets digit of a number at a decimal place
+ * @param {number} num 
+ * @param {number} place 
+ * @example getDigit(123, 0) returns 3
+ * @example getDigit(123, 2) returns 1
+ */
+const getDigit = (num, place) => {
+  const num_str = `${num}`;
+  const n = num_str.length;
+  const pos = n - 1 - place; // Note: "place" counts in reverse array order
+  return parseInt(num_str[pos]);
+};
+
+/**
+ * Executes radix sort
+ * @param {array} array 
+ */
 function radixSort(array) {
-  // code goes here
+  const d = getMaxLength(array);
+  const n = array.length;
+  const buckets = [...(new Array(10))].map((_, i) => ([]));
+  for (let place = 0; place < d; place++) {
+    for (let i = 0; i < n; i++) {
+      const num = array[0];
+      const num_digits = `${num}`.length;
+      const digit = (num_digits <= place) ? 0 : getDigit(num, place);
+      buckets[digit].push(num);
+      array.shift();
+    }
+    for (let i = 0; i < buckets.length; i++) {
+      array.push(...buckets[i]);
+      buckets[i] = [];
+    }
+  }
+  return array;
 }
 
 // unit tests
 // do not modify the below code
-describe.skip("radix sort", function () {
+describe("radix sort", function () {
   it("should sort correctly", () => {
     const nums = [
       20,
