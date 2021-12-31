@@ -3,12 +3,41 @@
 //
 // it's up to you what to return if the object isn't found (we're not testing that)
 
+/**
+ * @param {number} id 
+ * @param {array} array 
+ */
 function linearSearch(id, array) {
-  // code goes here
+  const n = array.length;
+  for (let i = 0; i < n; i++) {
+    if (array[i].id === id) {
+      return array[i];
+    }
+  }
+  return undefined;
 }
 
+/**
+ * @param {number} id 
+ * @param {array} array 
+ */
 function binarySearch(id, array) {
-  // code goes here
+  const n = array.length;
+  if (n < 2) {
+    return array[0]?.id === id
+      ? array[0]
+      : undefined;
+  }
+  const middle = Math.floor(n / 2);
+  const { id: middle_id } = array[middle];
+  if (middle_id === id) {
+    return array[middle];
+  } else {
+    if (middle_id < id) {
+      return binarySearch(id, array.slice(middle + 1, n));
+    }
+    return binarySearch(id, array.slice(0, middle));
+  }
 }
 
 // unit tests
