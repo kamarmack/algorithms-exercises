@@ -29,22 +29,22 @@ class Tree {
       let current_root = this.root;
       let found = false;
       while (!found) {
-        if (num > current_root.value) {
-          // go right
-          if (current_root.right === undefined) {
-            found = true;
-            current_root.right = n;
-          } else {
-            current_root = current_root.right;
-          }
-        }
-        else {
+        if (current_root.value > num) {
           // go left
           if (current_root.left === undefined) {
             found = true;
             current_root.left = n;
           } else {
             current_root = current_root.left;
+          }
+        }
+        else {
+          // go right
+          if (current_root.right === undefined) {
+            found = true;
+            current_root.right = n;
+          } else {
+            current_root = current_root.right;
           }
         }
       }
