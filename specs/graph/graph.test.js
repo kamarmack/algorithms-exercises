@@ -31,9 +31,15 @@ const findMostCommonTitle = (myId, degreesOfSeparation) => {
   const me = getUser(myId);
   const title_counter = { [me.title]: 1 };
   const touched = { [myId]: true };
-  // BAD BAD BAD – THIS MODIFIES THE "me" VARIABLE – MAKE A COPY
+  
+  // BAD BAD BAD
+  // THIS MODIFIES THE "me" VARIABLE – MAKE A COPY
   // const queue = me.connections;
+
+  // GOOD GOOD GOOD
   const queue = [].concat(me.connections);
+
+
   while (degreesOfSeparation > 0) {
     const temp = [];
     while (queue.length > 0) {
