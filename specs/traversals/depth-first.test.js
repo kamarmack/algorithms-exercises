@@ -1,18 +1,53 @@
 const preorderTraverse = (node, array) => {
-  // code goes here
+  array.push(node.value);
+  if (node.left) {
+    preorderTraverse(node.left, array);
+  }
+  if (node.right) {
+    preorderTraverse(node.right, array);
+  }
+  return array;
 };
 
 const inorderTraverse = (node, array) => {
-  // code goes here
+  if (node.left) {
+    inorderTraverse(node.left, array);
+  }
+  array.push(node.value);
+  if (node.right) {
+    inorderTraverse(node.right, array);
+  }
+  return array;
+};
+
+const inorderTraverseVerbose = (node, array) => {
+  if (!node.left) {
+    array.push(node.value);
+  }
+  else {
+    inorderTraverse(node.left, array);
+    array.push(node.value);
+  }
+  if (node.right) {
+    inorderTraverse(node.right, array);
+  }
+  return array;
 };
 
 const postorderTraverse = (node, array) => {
-  // code goes here
+  if (node.left) {
+    postorderTraverse(node.left, array);
+  }
+  if (node.right) {
+    postorderTraverse(node.right, array);
+  }
+  array.push(node.value);
+  return array;
 };
 
 // unit tests
 // do not modify the below code
-test.skip("depth-first traversals", function () {
+describe("depth-first traversals", function () {
   const tree = {
     value: 8,
     left: {
