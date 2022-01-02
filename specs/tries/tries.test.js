@@ -35,8 +35,12 @@ class Node {
     let p = this.children;
     for (let i = 0; i < path.length; i++) {
       const l = path[i].toLowerCase();
+      const end = i === path.length - 1;
       if (!p[l]) {
         p[l] = {};
+      }
+      if (end) {
+        p[l]._valid_string = true;
       }
       p = p[l];
     }
@@ -46,27 +50,64 @@ class Node {
    * @param {string} string 
    */
   complete(string) {
+    
     const path = this._getPath(string.toLowerCase().split(''));
+    
+    // No path
     if (path === -1) {
       return [];
     }
-    const path_children = Object.keys(path);
-    if (path_children.length === 0) {
-      return [string];
+    
+    // Grab all children
+    const total_children = Object.keys(path);
+    
+    // Initialize matches
+    const valid_string = total_children.includes('_valid_string');
+    const matches = valid_string ? [string] : [];
+    const char_children = total_children
+      .filter(c => c !== '_valid_string');
+    
+    // Base case
+    if (char_children.length === 0) {
+      return matches;
     }
-    if (path_children.length === 1 && path_children[0] === ' ') {
-      return this.complete(`${string} `);
+
+    // Recursive cases: At least one character child
+
+    // Case 1: There is one child, a space char.
+
+    // Run function again with a space at the end of string param. Then merge.
+    if (char_children.length === 1 && char_children[0] === ' ') {
+      return matches.concat(this.complete(`${string} `));
     }
-    const leaf_children = path_children
-      .filter(c => Object.keys(path[c]).length === 0);
-    const matches = leaf_children
-      .map(child_path => `${string}${child_path}`);
-    return matches
-      .concat(
-        ...path_children
-          .filter(c => Object.keys(path[c]).length > 0)
-          .map(c => this.complete(`${string}${c}`))
-      );
+
+    // Case 2: There is at least one non-space char child
+    
+    // Immediately merge the string param plus my childless children
+    const leaf_children = char_children
+      .filter(c => {
+        const child_path = path[c];
+        const child_path_total_children = Object.keys(child_path)
+          .filter(_c => _c !== '_valid_string');
+        return child_path_total_children.length === 0
+      });
+    matches.push(
+      ...leaf_children
+      .map(c => `${string}${c}`)
+    );
+
+    // Recurse on my children that have children
+    const child_bearing_children = char_children
+      .filter(c => {
+        const child_path = path[c];
+        const child_path_total_children = Object.keys(child_path)
+          .filter(_c => _c !== '_valid_string');
+        return child_path_total_children.length > 0
+      })
+      .map(c => this.complete(`${string}${c}`));
+
+    // Done
+    return matches.concat(...child_bearing_children);
   }
 
   /**
@@ -172,42 +213,11 @@ describe.skip("tries", function () {
     ).toBe(3);
   });
 
-  test.skip("dataset of 925 – san", () => {
+  test("dataset of 925 – san", () => {
     const root = createTrie(CITY_NAMES);
     const completions = root.complete("san");
-    // My algo breaks with this edge case: missing "sandy" but returns "sandy springs"
-    const incorrect_res = [
-      "san antonio",
-      "san angelo",
-      "san diego",
-      "san jose",
-      "san jacinto",
-      "san francisco",
-      "san bernardino",
-      "san buenaventura",
-      "san bruno",
-      "san mateo",
-      "san marcos",
-      "san leandro",
-      "san luis obispo",
-      "san ramon",
-      "san rafael",
-      "san clemente",
-      "san gabriel",
-      "santa ana",
-      "santa clara",
-      "santa clarita",
-      "santa cruz",
-      "santa rosa",
-      "santa maria",
-      "santa monica",
-      "santa barbara",
-      "santa fe",
-      "santee",
-      "sandy springs",
-      "sanford"
-    ];
     expect(completions.length).toBe(30);
+    console.log(JSON.stringify({ completions }));
     expect(
       _.intersection(completions, [
         "san antonio",
@@ -259,18 +269,11 @@ describe.skip("edge cases", () => {
     expect(completions.length).toBe(0);
   });
 
-  test.skip("handle words that are a subset of another string – salin", () => {
+  test("handle words that are a subset of another string – salin", () => {
     const root = createTrie(CITY_NAMES.slice(0, 800));
     const completions = root.complete("salin");
     console.log(completions);
-    // My algo breaks with this edge case
-    const incorrect_res = [ 'salinas' ];
     expect(completions.length).toBe(2);
     expect(_.intersection(completions, ["salina", "salinas"]).length).toBe(2);
   });
 });
-
-
-// Ideas for fixing algo would be using a "stopping" special character when a full word is 
-// included within another word. Other option would be extending an "invisible" special character from
-// smaller full word down to the larger word
