@@ -43,7 +43,7 @@ const createMaxHeap = (array) => {
 
 /**
  * @param {array} array 
- * @param {number} index [0, array.length)
+ * @param {number} index [0, heapSize)
  * @param {number} heapSize 
  */
 const heapify = (array, index, heapSize) => {
