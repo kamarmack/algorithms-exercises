@@ -46,8 +46,13 @@ K(4,3,2)
 = 14
 
 
-The above Keys are used to model A as a graph G such that
-G[A][K] returns N[]: the list of valid nodes reachable from node K in one hop.
+The above Keys are used to model A as a graph G such that:
+
+For each K in Keys:
+  G[A][K] returns N[].
+
+Each value k in N[] is the key of some node K' reachable in one hop.
+(Assume only horizontal and vertical hops of one space are allowed.)
 
 G[A] = {
 
@@ -88,21 +93,21 @@ W = {4,5,8,11,12}
 Wall nodes can not reach other nodes.
 Wall nodes can not be reached from other nodes.
 
-This leads to two useful invariants:
-  No element in G[A][K] can be a member of W
+This leads to two useful properties:
+  For each element K in Keys: no element k in G[A][K] can be a member of W
   For each element w in W: G[A][w] has no elements
 
-This leads to the following algorithm for G[Am][K]:
+Thus, if we denote an empty m x n array (no walls) as AEmxn,
+we have the following algorithm for G[A][K]:
 
-G[AE][K] =
+G[A][K] =
   if K in set W
     then return []
   else
     return G[AEmxn][K].filter( k => k not in set W )
 
 
-
-Compare the above to the graph of an empty 5 x 4 matrix (no walls) which is denoted as AE5x4
+Compare the above graph G[A] to the graph of G[AE5x4] to see algo in action
 
 G[AE5x4] = {
 
