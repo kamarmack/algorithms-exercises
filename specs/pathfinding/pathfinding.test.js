@@ -84,10 +84,9 @@ G[A] = {
 }
 
 
+Interesting corollary:
 
-Tip:
-
-In the above example, we have the following wall nodes
+In the above example, we have the following set of wall nodes
 W = {4,5,8,11,12}
 
 Wall nodes can not reach other nodes.
@@ -98,11 +97,11 @@ This leads to two useful properties:
   For each element w in W: G[A][w] has no elements
 
 Thus, if we denote an empty m x n array (no walls) as AEmxn,
-we have the following algorithm for G[A][K]:
+we can use the following algorithm to compute G[A][K]:
 
 G[A][K] =
   if K in set W
-    then return []
+    return []
   else
     return G[AEmxn][K].filter( k => k not in set W )
 
@@ -184,48 +183,41 @@ class Maze {
     const start_adj = al[start_key];
     const end_adj = al[end_key];
     if (start_adj.length === 0 || end_adj.length === 0) {
-      // (1) One of nodes is a wall, or
-      // (2) One of nodes is surrounded by walls
+      // (1) One or both nodes is a wall, or
+      // (2) One or both nodes is surrounded by walls
       return -1;
     }
 
-    let total;
-    let match_key;
-    let start_spiral_count = 0;
-    let end_spiral_count = 0;
-    const start_distance_map = { [start_key]: { distance: start_spiral_count } };
-    const end_distance_map = { [end_key]: { distance: end_spiral_count } };
+    let start_hops = 0;
+    let end_hops = 0;
+    const start_seen = { [start_key]: { distance: start_hops } };
+    const end_seen = { [end_key]: { distance: end_hops } };
     
     let process = 0;
     const start_queue = [].concat(start_adj);
     const end_queue = [].concat(end_adj);
 
-    while (
-      !match_key
-      && start_queue.length > 0
-      && end_queue.length > 0
-    ) {
+    while (start_queue.length > 0 && end_queue.length > 0) {
       if (process === 0) {
         // Spiral from start
         const temp = [];
-        start_spiral_count++;
+        start_hops++;
         while (start_queue.length > 0) {
           const child_key = start_queue.shift();
-          if (!start_distance_map[child_key]) {
+          if (!start_seen[child_key]) {
             // Unprocessed from start
-            if (end_distance_map[child_key]) {
+            if (end_seen[child_key]) {
               // Done
-              match_key = child_key;
-              total =
-                end_distance_map[child_key].distance
-                + start_spiral_count;
-              break;
+              return (
+                end_seen[child_key].distance
+                + start_hops
+              );
             }
-            start_distance_map[child_key] = {
-              distance: start_spiral_count,
+            start_seen[child_key] = {
+              distance: start_hops,
             };
             const unseen_child_adj = al[child_key]
-              .filter(c => !start_distance_map[c]);
+              .filter(c => !start_seen[c]);
             temp.push(...unseen_child_adj);
           }
         }
@@ -234,24 +226,23 @@ class Maze {
       } else {
         // Spiral from end
         const temp = [];
-        end_spiral_count++;
+        end_hops++;
         while (end_queue.length > 0) {
           const child_key = end_queue.shift();
-          if (!end_distance_map[child_key]) {
+          if (!end_seen[child_key]) {
             // Unprocessed from end
-            if (start_distance_map[child_key]) {
+            if (start_seen[child_key]) {
               // Done
-              match_key = child_key;
-              total =
-                start_distance_map[child_key].distance
-                + end_spiral_count;
-              break;
+              return (
+                start_seen[child_key].distance
+                + end_hops
+              );
             }
-            end_distance_map[child_key] = {
-              distance: end_spiral_count
+            end_seen[child_key] = {
+              distance: end_hops
             };
             const unseen_child_adj = al[child_key]
-              .filter(c => !end_distance_map[c]);
+              .filter(c => !end_seen[c]);
             temp.push(...unseen_child_adj);
           }
         }
@@ -260,9 +251,8 @@ class Maze {
       }
     }
 
-    return match_key
-      ? total
-      : -1;
+    // No path exists
+    return -1;
   }
 }
 
@@ -281,17 +271,14 @@ class Cell {
    * Matrix notation can make it very easy to make mistakes
    * when programming "Left/Right/Top/Bottom" logic.
    * 
-   * Typically you lay the matrix out as a grid to make a visual model,
-   * but afterwards you must account for two "inversions"
-   * 
    * In cartesian notation, the x term (the 1st term)
    * determines "Left/Right" relationships between coordinates.
    * 
    * However, in matrix notation the j term (the 2nd term)
    * determines "Left/Right" relationships between elements.
    * 
-   * Secondly, going "up" in cartesian notation requires addition whereas
-   * going "up" in matrix notation requires subtraction
+   * Secondly, going "up" in cartesian notation requires addition (of the y term)
+   * whereas going "up" in matrix notation requires subtraction (of the i term)
    * 
    */
   possibleConnectionCells() {
@@ -327,7 +314,7 @@ function findShortestPathLength(maze, [iA, jA], [iB, jB]) {
 }
 
 // unit tests
-describe.skip("pathfinding – cell class", function () {
+describe("pathfinding – cell class", function () {
   const c1 = new Cell(0, 0, 5, 4);
   const c2 = new Cell(2, 2, 5, 4);
   const c3 = new Cell(1, 3, 5, 4);
@@ -366,7 +353,7 @@ describe.skip("pathfinding – cell class", function () {
   });
 });
 
-describe.skip("pathfinding – happy path", function () {
+describe("pathfinding – happy path", function () {
   
   const testMatrix = [
     [0, 0, 2, 0],
@@ -467,10 +454,9 @@ describe.skip("pathfinding – happy path", function () {
   });
   /**/
 
-
 });
 
-describe.skip("pathfinding – edge cases", function () {
+describe("pathfinding – edge cases", function () {
   const byEachOther = [
     [0, 0, 0, 0, 0],
     [0, 2, 2, 0, 0],
