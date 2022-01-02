@@ -51,6 +51,7 @@ class Node {
    */
   complete(string) {
     
+    // Get reference to path
     const path = this._getPath(string.toLowerCase().split(''));
     
     // No path
@@ -67,22 +68,15 @@ class Node {
     const char_children = total_children
       .filter(c => c !== '_valid_string');
     
-    // Base case
+    // Base case: No children
+
+    // Done
     if (char_children.length === 0) {
       return matches;
     }
 
-    // Recursive cases: At least one character child
+    // Recursive case: At least one character child
 
-    // Case 1: There is one child, a space char.
-
-    // Run function again with a space at the end of string param. Then merge.
-    if (char_children.length === 1 && char_children[0] === ' ') {
-      return matches.concat(this.complete(`${string} `));
-    }
-
-    // Case 2: There is at least one non-space char child
-    
     // Immediately merge the string param plus my childless children
     const leaf_children = char_children
       .filter(c => {
