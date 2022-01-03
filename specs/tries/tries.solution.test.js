@@ -42,6 +42,8 @@ class Node {
   }
   _complete(search, built, suggestions) {
     if (suggestions.length >= 3 || (search && search[0] !== this.value)) {
+      // Prevents 'Sandy', 'Sandy Springs', 'Sandy Springs Resorts', 'Sandy Springs Resorts Lodge', ...
+      // i.e. deep terminus nodes along the same path that are all valid
       return suggestions;
     }
 
